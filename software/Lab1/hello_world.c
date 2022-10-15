@@ -160,7 +160,7 @@ int main()
 						background();
 						background_count += 1;
 					}
-					character_timing = background_count - 1;
+					character_timing = floor(background_count*7/8);
 					IOWR(RESPONSE_OUT_BASE, 0, 1);
 					IOWR(RESPONSE_OUT_BASE, 0, 0);
 				}
@@ -178,6 +178,11 @@ int main()
 					run = 0;
 					IOWR(RESPONSE_OUT_BASE, 0, 1);
 					IOWR(RESPONSE_OUT_BASE, 0, 0);
+					while (IORD(STIMULUS_IN_BASE, 0))
+					{
+						// background();
+						// background_count += 1;
+					}
 				}
 			}
 
