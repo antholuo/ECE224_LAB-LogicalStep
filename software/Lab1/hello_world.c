@@ -31,6 +31,8 @@ int main()
 
 	IOWR(STIMULUS_IN_BASE, 2, 0x1);
 
+	int avg_latency, missed, multi;
+
 	// max period 0xffff
 	int period = 1000;
 	int pulse_width = period / 2;
@@ -45,9 +47,9 @@ int main()
 
 	// get our data
 
-	int avg_latency = IORD(EGM_BASE, 4);
-	int missed = IORD(EGM_BASE, 5);
-	int multi = IORD(EGM_BASE, 6);
+	avg_latency = IORD(EGM_BASE, 4);
+	missed = IORD(EGM_BASE, 5);
+	multi = IORD(EGM_BASE, 6);
 
 	IOWR(EGM_BASE, 0, 0);
 

@@ -537,7 +537,7 @@ Disassembly of section .entry:
   800014:	08409114 	ori	at,at,580
     jmp r1
   800018:	0800683a 	jmp	at
-  80001c:	00000000 	call	0 <__alt_mem_sdram_0-0x800000>
+  80001c:	00000000 	call	0 <__reset-0x800000>
 
 Disassembly of section .exceptions:
 
@@ -1111,6 +1111,8 @@ int main()
   800378:	10843604 	addi	r2,r2,4312
   80037c:	10c00035 	stwio	r3,0(r2)
 
+	int avg_latency, missed, multi;
+
 	// max period 0xffff
 	int period = 1000;
   800380:	0080fa04 	movi	r2,1000
@@ -1160,17 +1162,17 @@ int main()
 
 	// get our data
 
-	int avg_latency = IORD(EGM_BASE, 4);
+	avg_latency = IORD(EGM_BASE, 4);
   8003f0:	00804034 	movhi	r2,256
   8003f4:	10840404 	addi	r2,r2,4112
   8003f8:	10800037 	ldwio	r2,0(r2)
   8003fc:	e0bffd15 	stw	r2,-12(fp)
-	int missed = IORD(EGM_BASE, 5);
+	missed = IORD(EGM_BASE, 5);
   800400:	00804034 	movhi	r2,256
   800404:	10840504 	addi	r2,r2,4116
   800408:	10800037 	ldwio	r2,0(r2)
   80040c:	e0bffe15 	stw	r2,-8(fp)
-	int multi = IORD(EGM_BASE, 6);
+	multi = IORD(EGM_BASE, 6);
   800410:	00804034 	movhi	r2,256
   800414:	10840604 	addi	r2,r2,4120
   800418:	10800037 	ldwio	r2,0(r2)
@@ -1450,15 +1452,15 @@ int main()
   800818:	00800a30 	cmpltui	r2,zero,40
   80081c:	008012fc 	xorhi	r2,zero,75
   800820:	00800a70 	cmpltui	r2,zero,41
-  800824:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  800828:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  80082c:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  800830:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  800834:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  800838:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  80083c:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  800840:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
-  800844:	00800a80 	call	800a8 <__alt_mem_sdram_0-0x77ff58>
+  800824:	00800a80 	call	800a8 <__reset-0x77ff58>
+  800828:	00800a80 	call	800a8 <__reset-0x77ff58>
+  80082c:	00800a80 	call	800a8 <__reset-0x77ff58>
+  800830:	00800a80 	call	800a8 <__reset-0x77ff58>
+  800834:	00800a80 	call	800a8 <__reset-0x77ff58>
+  800838:	00800a80 	call	800a8 <__reset-0x77ff58>
+  80083c:	00800a80 	call	800a8 <__reset-0x77ff58>
+  800840:	00800a80 	call	800a8 <__reset-0x77ff58>
+  800844:	00800a80 	call	800a8 <__reset-0x77ff58>
   800848:	008012fc 	xorhi	r2,zero,75
   80084c:	008012fc 	xorhi	r2,zero,75
   800850:	008012fc 	xorhi	r2,zero,75
@@ -1512,7 +1514,7 @@ int main()
   800910:	00801070 	cmpltui	r2,zero,65
   800914:	008012fc 	xorhi	r2,zero,75
   800918:	00801084 	movi	r2,66
-  80091c:	008012c0 	call	8012c <__alt_mem_sdram_0-0x77fed4>
+  80091c:	008012c0 	call	8012c <__reset-0x77fed4>
   800920:	00800fc8 	cmpgei	r2,zero,63
   800924:	00801274 	movhi	r2,73
   800928:	008012fc 	xorhi	r2,zero,75
@@ -9010,7 +9012,7 @@ int main()
   807bf8:	00807c20 	cmpeqi	r2,zero,496
   807bfc:	008083e0 	cmpeqi	r2,zero,527
   807c00:	008083e0 	cmpeqi	r2,zero,527
-  807c04:	00808380 	call	80838 <__alt_mem_sdram_0-0x77f7c8>
+  807c04:	00808380 	call	80838 <__reset-0x77f7c8>
   807c08:	42000204 	addi	r8,r8,8
   807c0c:	d8802317 	ldw	r2,140(sp)
   807c10:	1485883a 	add	r2,r2,r18
@@ -12119,7 +12121,7 @@ int main()
   80abac:	24803fcc 	andi	r18,r4,255
   80abb0:	a169c83a 	sub	r20,r20,r5
   80abb4:	1800683a 	jmp	r3
-  80abb8:	0080ae00 	call	80ae0 <__alt_mem_sdram_0-0x77f520>
+  80abb8:	0080ae00 	call	80ae0 <__reset-0x77f520>
   80abbc:	0080ac30 	cmpltui	r2,zero,688
   80abc0:	0080adc4 	movi	r2,695
   80abc4:	0080ac14 	movui	r2,688
@@ -12850,7 +12852,7 @@ int main()
   80b6f8:	0080b728 	cmpgeui	r2,zero,732
   80b6fc:	0080b728 	cmpgeui	r2,zero,732
   80b700:	0080b728 	cmpgeui	r2,zero,732
-  80b704:	0080bb00 	call	80bb0 <__alt_mem_sdram_0-0x77f450>
+  80b704:	0080bb00 	call	80bb0 <__reset-0x77f450>
   80b708:	8104b03a 	or	r2,r16,r4
   80b70c:	10006a1e 	bne	r2,zero,80b8b8 <__muldf3+0x2e0>
   80b710:	05400204 	movi	r21,8
@@ -20944,22 +20946,22 @@ alt_exception_cause_generated_bad_addr(alt_exception_cause cause)
   8104f4:	1885883a 	add	r2,r3,r2
   8104f8:	10800017 	ldw	r2,0(r2)
   8104fc:	1000683a 	jmp	r2
-  810500:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
-  810504:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
+  810500:	00810540 	call	81054 <__reset-0x77efac>
+  810504:	00810540 	call	81054 <__reset-0x77efac>
   810508:	00810550 	cmplti	r2,zero,1045
   81050c:	00810550 	cmplti	r2,zero,1045
   810510:	00810550 	cmplti	r2,zero,1045
-  810514:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
+  810514:	00810540 	call	81054 <__reset-0x77efac>
   810518:	00810548 	cmpgei	r2,zero,1045
   81051c:	00810550 	cmplti	r2,zero,1045
-  810520:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
-  810524:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
+  810520:	00810540 	call	81054 <__reset-0x77efac>
+  810524:	00810540 	call	81054 <__reset-0x77efac>
   810528:	00810550 	cmplti	r2,zero,1045
-  81052c:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
+  81052c:	00810540 	call	81054 <__reset-0x77efac>
   810530:	00810548 	cmpgei	r2,zero,1045
   810534:	00810550 	cmplti	r2,zero,1045
   810538:	00810550 	cmplti	r2,zero,1045
-  81053c:	00810540 	call	81054 <__alt_mem_sdram_0-0x77efac>
+  81053c:	00810540 	call	81054 <__reset-0x77efac>
   case NIOS2_EXCEPTION_MISALIGNED_TARGET_PC:
   case NIOS2_EXCEPTION_TLB_READ_PERM_VIOLATION:
   case NIOS2_EXCEPTION_TLB_WRITE_PERM_VIOLATION:
@@ -21076,7 +21078,7 @@ alt_exception_cause_generated_bad_addr(alt_exception_cause cause)
   8106a8:	d9400015 	stw	r5,0(sp)
   8106ac:	d9800115 	stw	r6,4(sp)
   8106b0:	d9c00215 	stw	r7,8(sp)
-  8106b4:	00000000 	call	0 <__alt_mem_sdram_0-0x800000>
+  8106b4:	00000000 	call	0 <__reset-0x800000>
   8106b8:	d9400017 	ldw	r5,0(sp)
   8106bc:	d9800117 	ldw	r6,4(sp)
   8106c0:	d9c00217 	ldw	r7,8(sp)
@@ -21162,7 +21164,7 @@ alt_exception_cause_generated_bad_addr(alt_exception_cause cause)
   8107f8:	10003426 	beq	r2,zero,8108cc <__call_exitprocs+0x18c>
   8107fc:	9809883a 	mov	r4,r19
   810800:	a8800015 	stw	r2,0(r21)
-  810804:	00000000 	call	0 <__alt_mem_sdram_0-0x800000>
+  810804:	00000000 	call	0 <__reset-0x800000>
   810808:	acc00017 	ldw	r19,0(r21)
   81080c:	983fe41e 	bne	r19,zero,8107a0 <__alt_data_end+0xff8107a0>
   810810:	dfc00b17 	ldw	ra,44(sp)
