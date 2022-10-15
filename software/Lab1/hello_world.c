@@ -143,46 +143,41 @@ int main()
 			IOWR(EGM_BASE, 2, period);
 			IOWR(EGM_BASE, 3, pulse_width);
 			background_count = 0;
-			character_timing = 0;
-
-			// program start
+			character_timing = -1;
+			int run = 0;
 			IOWR(EGM_BASE, 0, 1);
-
-			// tight poll until our first stimulus
 			while (IORD(STIMULUS_IN_BASE, 0) == 0)
 			{
 			}
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
-
-			while (IORD(STIMULUS_IN_BASE, 0) == 0)
-			{
-				background();
-				background_count += 1;
-				character_timing += 1;
-			}
-			IOWR(RESPONSE_OUT_BASE, 0, 1);
-			IOWR(RESPONSE_OUT_BASE, 0, 0);
-			character_timing = floor(character_timing * 7 / 8);
-
 			while (IORD(EGM_BASE, 1))
 			{
-				while (IORD(STIMULUS_IN_BASE, 0) == 0)
+				if (character_timing < 0)
 				{
+					while (IORD(STIMULUS_IN_BASE, 0) == 0)
+					{
+						background();
+						background_count += 1;
+					}
+					character_timing = background_count - 1;
+					IOWR(RESPONSE_OUT_BASE, 0, 1);
+					IOWR(RESPONSE_OUT_BASE, 0, 0);
 				}
-
-				IOWR(STIMULUS_IN_BASE, 0, 0x00);
-				IOWR(RESPONSE_OUT_BASE, 0, 1);
-				IOWR(RESPONSE_OUT_BASE, 0, 0);
-				while (IORD(STIMULUS_IN_BASE, 0))
+				if (!run)
 				{
-					background();
-					background_count += 1;
+					for (i = 0; i < character_timing; i++)
+					{
+						background();
+						background_count += 1;
+					}
+					run = 1;
 				}
-				for (i = 0; i < character_timing; i++)
+				if (IORD(STIMULUS_IN_BASE, 0) == 1)
 				{
-					background();
-					background_count += 1;
+					run = 0;
+					IOWR(RESPONSE_OUT_BASE, 0, 1);
+					IOWR(RESPONSE_OUT_BASE, 0, 0);
 				}
 			}
 
