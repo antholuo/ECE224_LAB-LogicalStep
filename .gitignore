@@ -1,0 +1,14 @@
+
+db/
+
+QD1/
+
+simulation/modelsim/
+
+incremental_db/compiled_partitions/
+
+output_files/
+
+software/.metadata/
+
+unsaved/
