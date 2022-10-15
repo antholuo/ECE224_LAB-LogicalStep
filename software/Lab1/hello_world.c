@@ -3,25 +3,28 @@
 #include "sys/alt_irq.h"
 #include "altera_avalon_pio_regs.h"
 
-static interrupt_count = 0;
+static background_count = 0;
 
-#define interrupt
-//#define polling
+//#define interrupt
+#define polling
 
-int background() {
+int background()
+{
 	int j;
 	int x = 0;
 	int grainsize = 4;
 	int g_taskProcessed = 0;
-	for (j = 0; j < grainsize; j++) {
+	for (j = 0; j < grainsize; j++)
+	{
 		g_taskProcessed++;
 	}
 	return x;
 }
 
-static void stimulus_in_ISR(void* context, alt_u32 id) {
+static void stimulus_in_ISR(void *context, alt_u32 id)
+{
 	// Return to Response Out here
-	interrupt_count += 1;
+	background_count += 1;
 	IOWR(RESPONSE_OUT_BASE, 0, 1);
 	IOWR(RESPONSE_OUT_BASE, 0, 0);
 	// clear our interrupt bit here
@@ -31,11 +34,12 @@ static void stimulus_in_ISR(void* context, alt_u32 id) {
 int main()
 {
 #ifdef interrupt
-	alt_irq_register(STIMULUS_IN_IRQ, (void *) 0, stimulus_in_ISR);
+	alt_irq_register(STIMULUS_IN_IRQ, (void *)0, stimulus_in_ISR);
 
 	IOWR(STIMULUS_IN_BASE, 2, 0x1);
 #endif
-
+	IOWR(RESPONSE_OUT_BASE, 4, 1);
+	IOWR(RESPONSE_OUT_BASE, 5, 1);
 	int avg_latency, missed, multi;
 
 	// max period 0xffff
@@ -46,20 +50,47 @@ int main()
 
 #ifdef interrupt
 	IOWR(EGM_BASE, 0, 1);
-	while(IORD(EGM_BASE, 1)) {
+	while (IORD(EGM_BASE, 1))
+	{
 		background();
 	}
 #endif
 #ifdef polling
+	int character_timing = -1;
+	int i;
 	IOWR(EGM_BASE, 0, 1);
-	while(IORD(EGM_BASE, 1)) {
-		if (IORD(STIMULUS_IN_BASE, 3)) {
-			interrupt_count += 1;
-			IOWR(STIMULUS_IN_BASE, 3, 0x0);
+	while (IORD(STIMULUS_IN_BASE, 0) == 0)
+	{
+	}
+	IOWR(RESPONSE_OUT_BASE, 0, 1);
+	IOWR(RESPONSE_OUT_BASE, 0, 0);
+	while (IORD(EGM_BASE, 1))
+	{
+		if (character_timing < 0)
+		{
+			while (IORD(STIMULUS_IN_BASE, 0) == 0)
+			{
+				background();
+				background_count += 1;
+			}
+			character_timing = background_count - 1;
+			IOWR(STIMULUS_IN_BASE, 0, 0x00);
+			IOWR(RESPONSE_OUT_BASE, 0, 1);
+			IOWR(RESPONSE_OUT_BASE, 0, 0);
+		}
+		for (i = 0; i < character_timing; i++)
+		{
+			background();
+			background_count += 1;
+		}
+		if (IORD(STIMULUS_IN_BASE, 0) == 1)
+		{
+			IOWR(STIMULUS_IN_BASE, 0, 0x00);
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
 		}
 	}
+	printf("character count %d \n", character_timing);
 #endif
 
 	// get our data
@@ -78,6 +109,6 @@ int main()
 
 	IOWR(EGM_BASE, 0, 0);
 
-	printf("done program %d with avg_latency: %d, missed: %d, multi: %d \n", interrupt_count, avg_latency, missed, multi);
+	printf("done program %d with avg_latency: %d, missed: %d, multi: %d \n", background_count, avg_latency, missed, multi);
 	return 0;
 }
