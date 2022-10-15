@@ -151,20 +151,21 @@ int main()
 			}
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
+			if (period>650) {
+				while(IORD(STIMULUS_IN_BASE, 0)){};
+			}
+
+			do
+			{
+				background();
+				background_count += 1;
+			} while (IORD(STIMULUS_IN_BASE, 0) == 0);
+			IOWR(RESPONSE_OUT_BASE, 0, 1);
+			IOWR(RESPONSE_OUT_BASE, 0, 0);
+			character_timing = floor(background_count * 7 / 8);
 			while (IORD(EGM_BASE, 1))
 			{
-				if (character_timing < 0)
-				{
-					while (IORD(STIMULUS_IN_BASE, 0) == 0)
-					{
-						background();
-						background_count += 1;
-					}
-					character_timing = floor(background_count*7/8);
-					IOWR(RESPONSE_OUT_BASE, 0, 1);
-					IOWR(RESPONSE_OUT_BASE, 0, 0);
-				}
-				if (!run)
+				if (run == 0)
 				{
 					for (i = 0; i < character_timing; i++)
 					{
@@ -173,15 +174,15 @@ int main()
 					}
 					run = 1;
 				}
-				if (IORD(STIMULUS_IN_BASE, 0) == 1)
+				if (IORD(STIMULUS_IN_BASE, 0))
 				{
 					run = 0;
 					IOWR(RESPONSE_OUT_BASE, 0, 1);
 					IOWR(RESPONSE_OUT_BASE, 0, 0);
 					while (IORD(STIMULUS_IN_BASE, 0))
 					{
-						// background();
-						// background_count += 1;
+						background();
+						background_count += 1;
 					}
 				}
 			}
