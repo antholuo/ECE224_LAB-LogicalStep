@@ -130,7 +130,7 @@ int main()
 
 			IOWR(EGM_BASE, 0, 0); // clear EGM for next run
 
-			printf("%d, %d, %d, %d, %d, %d\n", period, pulse_width, background_count, avg_latency, missed, multi);
+			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
 		}
 	}
 
@@ -151,9 +151,9 @@ int main()
 			}
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
-			if (period>650) {
-				while(IORD(STIMULUS_IN_BASE, 0)){};
-			}
+			while (IORD(STIMULUS_IN_BASE, 0))
+			{
+			};
 
 			do
 			{
@@ -162,7 +162,7 @@ int main()
 			} while (IORD(STIMULUS_IN_BASE, 0) == 0);
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
-			character_timing = floor(background_count * 7 / 8);
+			character_timing = floor(background_count * 3 / 4);
 			while (IORD(EGM_BASE, 1))
 			{
 				if (run == 0)
@@ -181,8 +181,8 @@ int main()
 					IOWR(RESPONSE_OUT_BASE, 0, 0);
 					while (IORD(STIMULUS_IN_BASE, 0))
 					{
-						background();
-						background_count += 1;
+//						background();
+//						background_count += 1;
 					}
 				}
 			}
@@ -193,7 +193,7 @@ int main()
 
 			IOWR(EGM_BASE, 0, 0);
 
-			printf("%d, %d, %d, %d, %d, %d\n", period, pulse_width, background_count, avg_latency, missed, multi);
+			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
 		}
 	}
 
