@@ -1,3 +1,14 @@
+/**
+ * @file hello_world.c
+ * @author Anthony Luo (a26luo@uwaterloo.ca)
+ * @brief ECE224-Lab1 file for running tight polling and interrupts for EGM stimulus
+ * @version 1.0
+ * @date 2022-10-18
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdio.h>
 #include <math.h>
 #include "system.h"
