@@ -4,9 +4,9 @@
  * @brief ECE224-Lab1 file for running tight polling and interrupts for EGM stimulus
  * @version 1.0
  * @date 2022-10-18
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 
 #include <stdio.h>
@@ -156,7 +156,7 @@ int main()
 	IOWR(RESPONSE_OUT_BASE, 5, 1);
 	if (interrupt)
 	{
-		//clear interrupt bit
+		// clear interrupt bit
 		IOWR(STIMULUS_IN_BASE, 3, 0x0);
 
 		// register interrupt
@@ -217,6 +217,7 @@ int main()
 			background_count = 0;
 			character_timing = -1;
 			int run = 0;
+			int edge = 1;
 
 			// start running our test
 			IOWR(EGM_BASE, 0, 1);
@@ -225,10 +226,11 @@ int main()
 			}
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
-//			while(IORD(STIMULUS_IN_BASE, 0)) {}
+			//			while(IORD(STIMULUS_IN_BASE, 0)) {}
 
-		// characterize our run
-			while(IORD(STIMULUS_IN_BASE, 0)) {
+			// characterize our run
+			while (IORD(STIMULUS_IN_BASE, 0))
+			{
 				background();
 				background_count += 1;
 			}
@@ -240,33 +242,37 @@ int main()
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
 			// -1, make it 0 if negative
-			character_timing = (background_count -1 );
-			if (character_timing <= 0) {
+			character_timing = (background_count - 1);
+			if (character_timing <= 0)
+			{
 				character_timing = 0;
 			}
 			run = 0;
-//			character_timing = floor(background_count * 3/4);
+			//			character_timing = floor(background_count * 3/4);
 
 			// loop for rest of our codes
 			while (IORD(EGM_BASE, 1))
 			{
-//				while(IORD(STIMULUS_IN_BASE, 0) == 0) {}
-//				IOWR(RESPONSE_OUT_BASE, 0, 1);
-//				IOWR(RESPONSE_OUT_BASE, 0, 0);
-				if (run == 0)
-								{
-									for (i = 0; i < character_timing; ++i)
-									{
-										background();
-										background_count += 1;
-									}
-									run = 1;
-								}
-				if (IORD(STIMULUS_IN_BASE, 0))
+				//				while(IORD(STIMULUS_IN_BASE, 0) == 0) {}
+				//				IOWR(RESPONSE_OUT_BASE, 0, 1);
+				//				IOWR(RESPONSE_OUT_BASE, 0, 0);
+				if (IORD(STIMULUS_IN_BASE, 0) && !edge)
 				{
+					edge = 1;
 					run = 0;
 					IOWR(RESPONSE_OUT_BASE, 0, 1);
 					IOWR(RESPONSE_OUT_BASE, 0, 0);
+				} else {
+					edge = 0;
+				}
+				if (run == 0)
+				{
+					for (i = 0; i < character_timing; ++i)
+					{
+						background();
+						background_count += 1;
+					}
+					run = 1;
 				}
 			}
 
@@ -277,7 +283,7 @@ int main()
 			IOWR(EGM_BASE, 0, 0);
 
 			// print outputs in CSV format
-			printf("%d, %d, %d, %d, %d, %d, %d\n", period, pulse_width, background_count, avg_latency, missed, multi, character_timing);
+			printf("%d, %d, %d, %d, %d, %d\n", period, pulse_width, background_count, avg_latency, missed, multi);
 			// #ifdef DEBUG
 			// 			IOWR(LED_PIO_BASE, 0, 0x0);
 			// #endif
