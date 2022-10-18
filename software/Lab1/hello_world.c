@@ -12,8 +12,15 @@
  * 4. while your stimulus is still 1 (after a post), run background (otherwise you may repeat at high freq)
  * 5. 1-3 doesn't need to be in a while loop
  * */
+
+#define DEBUG
+
 int background()
 {
+#ifdef DEBUG
+	int leds = IORD(LED_PIO_BASE, 0);
+	IOWR(LED_PIO_BASE, 0, (leds | 0x1));
+#endif
 	int j;
 	int x = 0;
 	int grainsize = 4;
@@ -22,16 +29,30 @@ int background()
 	{
 		g_taskProcessed++;
 	}
+#ifdef DEBUG
+	// turn off just the stimulus in ISR LED
+	leds = IORD(LED_PIO_BASE, 0);
+	IOWR(LED_PIO_BASE, 0, (leds & 0b1110));
 	return x;
+#endif
 }
 
 static void stimulus_in_ISR(void *context, alt_u32 id)
 {
+#ifdef DEBUG
+	int leds = IORD(LED_PIO_BASE, 0);
+	IOWR(LED_PIO_BASE, 0, (leds | 0x4));
+#endif
 	// Return to Response Out here
 	IOWR(RESPONSE_OUT_BASE, 0, 1);
 	IOWR(RESPONSE_OUT_BASE, 0, 0);
 	// clear our interrupt bit here
 	IOWR(STIMULUS_IN_BASE, 3, 0x0);
+#ifdef DEBUG
+	// turn off just the stimulus in ISR LED
+	leds = IORD(LED_PIO_BASE, 0);
+	IOWR(LED_PIO_BASE, 0, (leds & 0b0111));
+#endif
 }
 
 int main()
@@ -49,9 +70,12 @@ int main()
 	static volatile int toggled = 0;
 	static int background_count = 0;
 
-	////////////////
-	// Program Begin Sequence
-	////////////////
+////////////////
+// Program Begin Sequence
+////////////////
+#ifdef DEBUG
+	IOWR(LED_PIO_BASE, 0, 0x8);
+#endif
 	switch_state = (0x01 & IORD(SWITCH_PIO_BASE, 0));
 	if (switch_state == 0)
 	{
@@ -102,13 +126,16 @@ int main()
 
 	IOWR(RESPONSE_OUT_BASE, 4, 1);
 	IOWR(RESPONSE_OUT_BASE, 5, 1);
-
 	if (interrupt)
 	{
 		alt_irq_register(STIMULUS_IN_IRQ, (void *)0, stimulus_in_ISR);
 		IOWR(STIMULUS_IN_BASE, 2, 0x1);
 		for (period = 2; period <= 5000; period += 2)
 		{
+#ifdef debug
+			// LED for start of task run
+			IOWR(LED_PIO_BASE, 0, 0x2);
+#endif
 			// configure variables
 			pulse_width = period / 2;
 			IOWR(EGM_BASE, 2, period);
@@ -131,6 +158,9 @@ int main()
 			IOWR(EGM_BASE, 0, 0); // clear EGM for next run
 
 			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
+#ifdef DEBUG
+			IOWR(LED_PIO_BASE, 0, 0x0);
+#endif
 		}
 	}
 
@@ -138,6 +168,10 @@ int main()
 	{
 		for (period = 2; period <= 5000; period += 2)
 		{
+#ifdef DEBUG
+			// LED for start of task run
+			IOWR(LED_PIO_BASE, 0, 0x2);
+#endif DEBUG
 			// configure variables
 			pulse_width = period / 2;
 			IOWR(EGM_BASE, 2, period);
@@ -181,8 +215,8 @@ int main()
 					IOWR(RESPONSE_OUT_BASE, 0, 0);
 					while (IORD(STIMULUS_IN_BASE, 0))
 					{
-//						background();
-//						background_count += 1;
+						//						background();
+						//						background_count += 1;
 					}
 				}
 			}
@@ -194,10 +228,17 @@ int main()
 			IOWR(EGM_BASE, 0, 0);
 
 			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
+#ifdef DEBUG
+			IOWR(LED_PIO_BASE, 0, 0x0);
+#endif
 		}
 	}
 
 	printf("Program complete!\n");
+
+#ifdef DEBUG
+	IOWR(LED_PIO_BASE, 0, 0);
+#endif
 
 	return 0;
 }
