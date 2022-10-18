@@ -136,6 +136,7 @@ int main()
 #ifdef DEBUG
 			// LED for start of task run
 			IOWR(LED_PIO_BASE, 0, 0x2);
+			IOWR(LED_PIO_BASE, 0, 0);
 #endif
 			// configure variables
 			pulse_width = period / 2;
@@ -159,9 +160,9 @@ int main()
 			IOWR(EGM_BASE, 0, 0); // clear EGM for next run
 
 			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
-#ifdef DEBUG
-			IOWR(LED_PIO_BASE, 0, 0x0);
-#endif
+// #ifdef DEBUG
+// 			IOWR(LED_PIO_BASE, 0, 0x0);
+// #endif
 		}
 	}
 
@@ -172,6 +173,7 @@ int main()
 #ifdef DEBUG
 			// LED for start of task run
 			IOWR(LED_PIO_BASE, 0, 0x2);
+			IOWR(LED_PIO_BASE, 0, 0);
 #endif DEBUG
 			// configure variables
 			pulse_width = period / 2;
@@ -229,9 +231,9 @@ int main()
 			IOWR(EGM_BASE, 0, 0);
 
 			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
-#ifdef DEBUG
-			IOWR(LED_PIO_BASE, 0, 0x0);
-#endif
+// #ifdef DEBUG
+// 			IOWR(LED_PIO_BASE, 0, 0x0);
+// #endif
 		}
 	}
 
