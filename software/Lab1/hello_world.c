@@ -19,7 +19,7 @@ int background()
 {
 #ifdef DEBUG
 	int leds = IORD(LED_PIO_BASE, 0);
-	IOWR(LED_PIO_BASE, 0, (leds | 0x1));
+	IOWR(LED_PIO_BASE, 0, (leds | 0b0001));
 #endif
 	int j;
 	int x = 0;
@@ -41,7 +41,7 @@ static void stimulus_in_ISR(void *context, alt_u32 id)
 {
 #ifdef DEBUG
 	int leds = IORD(LED_PIO_BASE, 0);
-	IOWR(LED_PIO_BASE, 0, (leds | 0x4));
+	IOWR(LED_PIO_BASE, 0, (leds | 0b0100));
 #endif
 	// Return to Response Out here
 	IOWR(RESPONSE_OUT_BASE, 0, 1);
@@ -51,7 +51,7 @@ static void stimulus_in_ISR(void *context, alt_u32 id)
 #ifdef DEBUG
 	// turn off just the stimulus in ISR LED
 	leds = IORD(LED_PIO_BASE, 0);
-	IOWR(LED_PIO_BASE, 0, (leds & 0b0111));
+	IOWR(LED_PIO_BASE, 0, (leds & 0b1011));
 #endif
 }
 
@@ -69,12 +69,13 @@ int main()
 	int not_started = 1;
 	static volatile int toggled = 0;
 	static int background_count = 0;
+	int leds;
 
 ////////////////
 // Program Begin Sequence
 ////////////////
 #ifdef DEBUG
-	IOWR(LED_PIO_BASE, 0, 0x8);
+	IOWR(LED_PIO_BASE, 0, 0b1000);
 #endif
 	switch_state = (0x01 & IORD(SWITCH_PIO_BASE, 0));
 	if (switch_state == 0)
@@ -132,7 +133,7 @@ int main()
 		IOWR(STIMULUS_IN_BASE, 2, 0x1);
 		for (period = 2; period <= 5000; period += 2)
 		{
-#ifdef debug
+#ifdef DEBUG
 			// LED for start of task run
 			IOWR(LED_PIO_BASE, 0, 0x2);
 #endif
