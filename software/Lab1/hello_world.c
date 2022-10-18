@@ -15,6 +15,11 @@
 
 #define DEBUG
 
+/**
+ * @brief background task for ece224 lab1
+ *
+ * @return int
+ */
 int background()
 {
 #ifdef DEBUG
@@ -37,16 +42,23 @@ int background()
 #endif
 }
 
+/**
+ * @brief Stimulus_in Interrupt Service Routine
+ *
+ * @param context
+ * @param id
+ */
 static void stimulus_in_ISR(void *context, alt_u32 id)
 {
 #ifdef DEBUG
 	int leds = IORD(LED_PIO_BASE, 0);
 	IOWR(LED_PIO_BASE, 0, (leds | 0b0100));
 #endif
-	// Return to Response Out here
+	// Return to Response Out
 	IOWR(RESPONSE_OUT_BASE, 0, 1);
 	IOWR(RESPONSE_OUT_BASE, 0, 0);
-	// clear our interrupt bit here
+
+	// clear our interrupt bit
 	IOWR(STIMULUS_IN_BASE, 3, 0x0);
 #ifdef DEBUG
 	// turn off just the stimulus in ISR LED
@@ -71,9 +83,9 @@ int main()
 	static int background_count = 0;
 	int leds;
 
-////////////////
-// Program Begin Sequence
-////////////////
+	////////////////
+	// Program Begin Sequence
+	////////////////
 #ifdef DEBUG
 	IOWR(LED_PIO_BASE, 0, 0b1000);
 #endif
@@ -144,7 +156,7 @@ int main()
 			IOWR(EGM_BASE, 3, pulse_width);
 			background_count = 0;
 
-			// start running
+			// start running the test
 			IOWR(EGM_BASE, 0, 1);
 			while (IORD(EGM_BASE, 1))
 			{
@@ -159,10 +171,11 @@ int main()
 
 			IOWR(EGM_BASE, 0, 0); // clear EGM for next run
 
+			// print output in CSV format
 			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
-// #ifdef DEBUG
-// 			IOWR(LED_PIO_BASE, 0, 0x0);
-// #endif
+			// #ifdef DEBUG
+			// 			IOWR(LED_PIO_BASE, 0, 0x0);
+			// #endif
 		}
 	}
 
@@ -182,16 +195,19 @@ int main()
 			background_count = 0;
 			character_timing = -1;
 			int run = 0;
+
+			// start running our test
 			IOWR(EGM_BASE, 0, 1);
 			while (IORD(STIMULUS_IN_BASE, 0) == 0)
-			{
+			{ // wait for first stimulus in
 			}
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
+
+			// characterize our run
 			while (IORD(STIMULUS_IN_BASE, 0))
 			{
 			};
-
 			do
 			{
 				background();
@@ -199,7 +215,9 @@ int main()
 			} while (IORD(STIMULUS_IN_BASE, 0) == 0);
 			IOWR(RESPONSE_OUT_BASE, 0, 1);
 			IOWR(RESPONSE_OUT_BASE, 0, 0);
-			character_timing = floor(background_count * 3 / 4);
+			character_timing = floor(background_count * 3 / 4); /* choose 3/4 insead of -1 for high freq */
+
+			// loop for rest of our codes
 			while (IORD(EGM_BASE, 1))
 			{
 				if (run == 0)
@@ -230,15 +248,17 @@ int main()
 
 			IOWR(EGM_BASE, 0, 0);
 
+			// print outputs in CSV format
 			printf("%d, %d, %d, %d, %d, %d,\n", period, pulse_width, background_count, avg_latency, missed, multi);
-// #ifdef DEBUG
-// 			IOWR(LED_PIO_BASE, 0, 0x0);
-// #endif
+			// #ifdef DEBUG
+			// 			IOWR(LED_PIO_BASE, 0, 0x0);
+			// #endif
 		}
 	}
 
 	printf("Program complete!\n");
 
+// clear LED's (not strictly necessary)
 #ifdef DEBUG
 	IOWR(LED_PIO_BASE, 0, 0);
 #endif
